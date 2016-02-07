@@ -41,7 +41,7 @@ class JeedomHandler(BaseHTTPRequestHandler):
         return
 
     # Handler for the GET requests
-    def do_get(self):
+    def do_GET(self):
         # Part 1: Get the correct GET request from jeedom
         try:
             parsed_url = urllib.parse.urlparse(self.path)
@@ -64,8 +64,8 @@ class JeedomHandler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
-        client = InfluxDBClient(INLUXDB_SERVER_IP, INLUXDB_SERVER_PORT, INFLUXDB_USERNAME, INFLUXDB_PASSWORD,
-                                INFLUXDB_DB_NAME)
+        client = InfluxDBClient(INLUXDB_SERVER_IP, INLUXDB_SERVER_PORT, INFLUXDB_USERNAME, INFLUXDB_PASSWORD, INFLUXDB_DB_NAME)
+        
         # Build JSON data
         req = [
             {
