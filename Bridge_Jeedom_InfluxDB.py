@@ -46,12 +46,22 @@ class JeedomHandler(BaseHTTPRequestHandler):
         try:
             parsed_url = urllib.parse.urlparse(self.path)
             query = urllib.parse.parse_qs(parsed_url.query)
+            #print(query)
             # Extract the value, the name and the location + add current time
-            val = float(query["val"][0])
-            name = query["name"][0]
-            name = name.encode('latin-1').decode('utf-8')
-            location = query["location"][0]
-            act_time = time.time() * 1000000000
+            try:
+                val=query["val"][0]
+                try:
+                    val = float(query["val"][0])
+                except:
+                    val = query["val"][0]
+                name = query["name"][0]
+                #name = name.encode('latin-1').decode('utf-8')
+                name = urllib.parse.unquote(name)
+                location = query["location"][0]
+                act_time = time.time() * 1000000000
+            except:
+                #print('no value in url')
+                return
         except:
             print("URL Parsing error: ", sys.exc_info()[0])
             self.send_response(400)
@@ -61,11 +71,13 @@ class JeedomHandler(BaseHTTPRequestHandler):
             return
 
         # Part 2: Write Data to InfluxDB
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
-        client = InfluxDBClient(INLUXDB_SERVER_IP, INLUXDB_SERVER_PORT, INFLUXDB_USERNAME, INFLUXDB_PASSWORD, INFLUXDB_DB_NAME)
-        
+        if val !='':
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            client = InfluxDBClient(INLUXDB_SERVER_IP, INLUXDB_SERVER_PORT, INFLUXDB_USERNAME, INFLUXDB_PASSWORD, INFLUXDB_DB_NAME)
+
+
         # Build JSON data
         req = [
             {
